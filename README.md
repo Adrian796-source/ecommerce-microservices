@@ -29,3 +29,6 @@ El ecosistema está compuesto por los siguientes servicios, cada uno con su prop
 2.  Configurar las variables de entorno para la base de datos.
 3.  Iniciar los servicios en el siguiente orden: Config Server, Eureka Server, y luego los demás microservicios de negocio y el API Gateway.
 
+
+
+
