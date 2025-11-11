@@ -3,17 +3,17 @@ package com.adrian.producto.service;
 import com.adrian.producto.dto.ProductoDTO;
 import com.adrian.producto.model.Producto;
 import com.adrian.producto.repository.IProductoRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 public class ProductoService implements IProductoService {
 
-    @Autowired
-    private IProductoRepository productoRepository;
+
+    private final IProductoRepository productoRepository;
 
     @Override
     public List<ProductoDTO> getProductos() {
@@ -22,7 +22,7 @@ public class ProductoService implements IProductoService {
         // 2. Se mapea cada entidad a un DTO y se devuelve la lista de DTOs
         return listaProductos.stream()
                 .map(this::convertToDto)
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Override

@@ -15,26 +15,32 @@ import java.util.List;
 @Service
 public class VentaService implements IVentaService {
 
-    @Autowired
-    private IVentaRepository ventaRepo;
 
-    @Autowired
-    private ICarritoAPI carritoAPI;
+    private final IVentaRepository ventaRepo;
+    private final ICarritoAPI carritoAPI;
+    private final ICarritoClient carritoClient;
+
+    public VentaService(IVentaRepository ventaRepo, ICarritoAPI carritoAPI, ICarritoClient carritoClient) {
+        this.ventaRepo = ventaRepo;
+        this.carritoAPI = carritoAPI;
+        this.carritoClient = carritoClient;
+    }
 
     @Override
     public void saveVenta(Venta venta) {
+        // CORRECCIÓN: El método saveVenta solo debe guardar la entidad.
         ventaRepo.save(venta);
     }
 
     @Override
-    public VentaDTO findVenta(Long idVenta) { // <-- CAMBIO: Ya no necesita Circuit Breaker aquí
+    public VentaDTO findVenta(Long idVenta) {
         Venta venta = ventaRepo.findById(idVenta).orElse(null);
         if (venta == null) {
             return null;
         }
 
-        // <-- CAMBIO: Llamamos a nuestro nuevo método protegido
-        CarritoDTO carrito = this.findCarritoById(venta.getIdCarrito());
+        // Llamamos al método en el nuevo bean, que sí está protegido por el proxy
+        CarritoDTO carrito = carritoClient.findCarritoById(venta.getIdCarrito());
 
         VentaDTO ventaDTO = new VentaDTO();
         ventaDTO.setIdVenta(venta.getIdVenta());

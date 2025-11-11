@@ -2,47 +2,54 @@ package com.adrian.producto.controller;
 
 import com.adrian.producto.dto.ProductoDTO;
 import com.adrian.producto.service.IProductoService;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/productos")
+@RequestMapping("/api/productos")
+@RequiredArgsConstructor // Lombok crea el constructor con los campos 'final'
 public class ProductoController {
 
-    @Autowired
-    private IProductoService productoService;
+    private final IProductoService productoService;
 
     @GetMapping
-    public List<ProductoDTO> getProductos() {
-        // El servicio ya devuelve la lista de DTOs
-        return productoService.getProductos();
+    public ResponseEntity<List<ProductoDTO>> getProductos() {
+        return ResponseEntity.ok(productoService.getProductos());
     }
 
     @GetMapping("/{idProducto}")
-    public ProductoDTO getProducto(@PathVariable Long idProducto) {
-        // El servicio ya devuelve el DTO
-        return productoService.getProducto(idProducto);
+    public ResponseEntity<ProductoDTO> getProducto(@PathVariable Long idProducto) {
+        ProductoDTO producto = productoService.getProducto(idProducto);
+        if (producto != null) {
+            return ResponseEntity.ok(producto);
+        } else {
+            return ResponseEntity.notFound().build();
+        }
+
     }
 
     @PostMapping
-    public String createProducto(@RequestBody ProductoDTO producto) {
+    public ResponseEntity<String> createProducto(@RequestBody ProductoDTO producto) {
         // Se envía el DTO al servicio
         productoService.createProducto(producto);
-        return "Producto creado exitosamente";
+        return new ResponseEntity<>("Producto creado exitosamente", HttpStatus.CREATED);
     }
 
     @PutMapping("/{idProducto}")
-    public String editProducto(@PathVariable Long idProducto, @RequestBody ProductoDTO producto) {
+    public ResponseEntity<ProductoDTO> editProducto(@PathVariable Long idProducto, @RequestBody ProductoDTO producto) {
         // Se envía el ID y el DTO al servicio
         productoService.editProducto(idProducto, producto);
-        return "Producto editado exitosamente";
+        // Devolvemos el producto actualizado
+        return ResponseEntity.ok(productoService.getProducto(idProducto));
     }
 
     @DeleteMapping("/{idProducto}")
-    public String deleteProducto(@PathVariable Long idProducto) {
+    public ResponseEntity<String> deleteProducto(@PathVariable Long idProducto) {
         productoService.deleteProducto(idProducto);
-        return "Producto eliminado exitosamente";
+        return ResponseEntity.ok("Producto eliminado exitosamente");
     }
 }
